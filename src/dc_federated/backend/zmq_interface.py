@@ -1,3 +1,7 @@
+"""
+Two classes for defining the ZeroMQ interface between the server and the model.
+"""
+
 import zmq
 import logging
 
