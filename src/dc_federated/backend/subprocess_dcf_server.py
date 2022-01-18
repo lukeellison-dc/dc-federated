@@ -1,11 +1,12 @@
 """
-Defines the core server class for the federated learning.
-Abstracts away the lower level server logic from the federated
-machine learning logic.
+A script for running the DCFServer without a federated learning algorithm.
+Instead the callbacks are implemented as ZeroMQ messages using the 
+ZMQ Interface defined in dc_federated.backend.zmq_interface. This script is
+intended to be run from the DCFServerHandler defined in dc_federated.backend.dcf_server.
 """
 
 from dc_federated.backend.dcf_server import DCFServer
-from dc_federated.backend.zqm_interface import ZQMInterfaceServer
+from dc_federated.backend.zmq_interface import ZMQInterfaceServer
 
 import logging
 
@@ -14,15 +15,15 @@ logger.setLevel(level=logging.INFO)
 
 logger.info('Starting server as a subprocess.')
 
-zqmi = ZQMInterfaceServer()
-server_subprocess_args = zqmi.server_args_request_send()
+zmqi = ZMQInterfaceServer()
+server_subprocess_args = zmqi.server_args_request_send()
 
 server = DCFServer(
-    register_worker_callback=zqmi.register_worker_send,
-    unregister_worker_callback=zqmi.unregister_worker_send,
-    return_global_model_callback=zqmi.return_global_model_send,
-    is_global_model_most_recent=zqmi.is_global_model_most_recent_send,
-    receive_worker_update_callback=zqmi.receive_worker_update_send,
+    register_worker_callback=zmqi.register_worker_send,
+    unregister_worker_callback=zmqi.unregister_worker_send,
+    return_global_model_callback=zmqi.return_global_model_send,
+    is_global_model_most_recent=zmqi.is_global_model_most_recent_send,
+    receive_worker_update_callback=zmqi.receive_worker_update_send,
     **server_subprocess_args,
 )
 server.start_server()

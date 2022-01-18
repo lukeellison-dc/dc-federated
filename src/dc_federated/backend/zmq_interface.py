@@ -5,7 +5,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(level=logging.INFO)
 
 
-class ZQMInterfaceModel():
+class ZMQInterfaceModel():
 
     def __init__(self, 
         socket,

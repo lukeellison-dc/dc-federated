@@ -27,7 +27,7 @@ from dc_federated.backend.backend_utils import *
 from dc_federated.utils import get_host_ip
 from dc_federated.backend.backend_utils import is_valid_model_dict
 from dc_federated.backend._worker_manager import WorkerManager
-from dc_federated.backend.zqm_interface import ZQMInterfaceModel
+from dc_federated.backend.zmq_interface import ZMQInterfaceModel
 
 import logging
 
@@ -659,8 +659,6 @@ class DCFServer(object):
                 timeout=60*60*24,
                 quiet=True)
 
-        logger.info('finished running.')
-
 
 class DCFServerHandler(object):
     """
@@ -748,7 +746,7 @@ class DCFServerHandler(object):
         Sets up the interface for the ZeroMQ socket and waits (blocking) for
         any messages to the socket.
         """
-        zqmi = ZQMInterfaceModel(
+        zmqi = ZMQInterfaceModel(
             socket=self.socket,
             register_worker_callback=self.register_worker_callback,
             unregister_worker_callback=self.unregister_worker_callback,
@@ -760,4 +758,4 @@ class DCFServerHandler(object):
         while True:
             #  Wait for next request from client
             logger.debug('Waiting for next zmq message...')
-            zqmi.receive()
+            zmqi.receive()
