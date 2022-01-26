@@ -15,7 +15,7 @@ is_global_model_most_recent = Mock(return_value=IS_MOST_RECENT)
 WORKER_UPDATE='test_string'
 receive_worker_update_callback = Mock(return_value=WORKER_UPDATE)
 server_subprocess_args = ['test', 'subprocess', 'args', 1, True, None]
-port = 5555
+port = 5556
 
 def mock_recv(context, socket, fn_name, close=True):
     original_recv = getattr(socket, fn_name)
