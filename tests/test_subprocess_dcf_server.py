@@ -1,16 +1,11 @@
-from unittest.mock import patch, MagicMock, ANY
-import subprocess as sp
-import dc_federated
+from unittest.mock import patch, ANY
 from dc_federated.backend.zmq_interface import ZMQInterfaceServer
 from dc_federated.backend.dcf_server import DCFServer
 from dc_federated.backend.subprocess_dcf_server import run as run_subprocess
-import os
-import sys
 
-project_root = os.path.dirname(dc_federated.__file__)
 server_subprocess_args = {'arg1': 'test1', 'arg2': 'test2'}
 
-@patch.object(ZMQInterfaceServer, 'server_args_request_send', return_value={'arg1': 'test1', 'arg2': 'test2'})
+@patch.object(ZMQInterfaceServer, 'server_args_request_send', return_value=server_subprocess_args)
 @patch.object(ZMQInterfaceServer, '__init__', return_value=None)
 @patch.object(DCFServer, 'start_server')
 @patch.object(DCFServer, '__init__', return_value=None)
