@@ -10,11 +10,13 @@ from dc_federated.backend.zmq_interface import ZMQInterfaceServer
 
 import logging
 import sys
+
 logger = logging.getLogger(__name__)
 logger.setLevel(level=logging.INFO)
 
+
 def run(port):
-    logger.info('Starting server as a subprocess.')
+    logger.info("Starting server as a subprocess.")
 
     print(ZMQInterfaceServer)
     zmqi = ZMQInterfaceServer(port)
@@ -30,5 +32,6 @@ def run(port):
     )
     server.start_server()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     run(port=sys.argv[1])

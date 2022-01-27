@@ -729,7 +729,7 @@ class DCFServerHandler(object):
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
         subprocess_file = f"{current_dir}/subprocess_dcf_server.py"
-        command = ' '.join(["python", subprocess_file, str(self.socket_port)])
+        command = " ".join(["python", subprocess_file, str(self.socket_port)])
         sp.Popen(command, stdout=sys.stdout, stderr=sys.stderr, shell=True)
         
         self.wait_for_messages()
@@ -753,12 +753,12 @@ class DCFServerHandler(object):
             unregister_worker_callback=self.unregister_worker_callback,
             return_global_model_callback=self.return_global_model_callback,
             is_global_model_most_recent=self.is_global_model_most_recent,
-            receive_worker_update_callback=self.receive_worker_update_callback, 
-            server_subprocess_args=self.server_subprocess_args           
+            receive_worker_update_callback=self.receive_worker_update_callback,
+            server_subprocess_args=self.server_subprocess_args,
         )
         while True:
             #  Wait for next request from client
-            logger.debug('Waiting for next zmq message...')
+            logger.debug("Waiting for next zmq message...")
             zmqi.receive()
 
     def __del__(self):
