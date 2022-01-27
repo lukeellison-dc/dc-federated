@@ -6,6 +6,9 @@ import threading
 import time
 import pytest
 
+# Initalise some mocks that can be used in place of the callbacks to check that
+# they are called. Along with some other constants that are used to check for
+# equality in the tests.
 register_worker_callback = Mock()
 unregister_worker_callback = Mock()
 GLOBAL_MODEL = {'test':'test_val'}
@@ -18,23 +21,35 @@ server_subprocess_args = ['test', 'subprocess', 'args', 1, True, None]
 port = 5556
 
 def mock_recv(context, socket, fn_name, close=True):
-    original_recv = getattr(socket, fn_name)
+    """
+    A function that takes a zmq recv function and mocks it from being a
+    blocking call to a polled call. This means that it can be threaded using
+    the same interpreter without preventing the test from continuing/finishing.
+    """    
+
+    original_recv = getattr(socket, fn_name) # Hold original recv function
     def recv_py(flags=0):
         poller = zmq.Poller()
         poller.register(socket, zmq.POLLIN)
         while True:
             evts = poller.poll(500)
             if len(evts) > 0:
-                result = original_recv(flags=flags)
+                # If we get a message call the original blocking recv
+                result = original_recv(flags=flags) 
                 if close:
                     socket.close()
                     context.term()
                 return result
+            # Release the GIL to send/receive messages on the other socket.
             time.sleep(0.5)
     
     setattr(socket, fn_name, Mock(side_effect=recv_py))
 
 def mock_new_socket():
+    """
+    A function for mocking the ZMQInterfaceServer `_new_socket` function that
+    converts the relevant "recv" functions from blocking to non-blocking.
+    """    
     context = zmq.Context()
     socket = context.socket(zmq.REQ)
     socket.connect(f"tcp://localhost:{port}")
@@ -46,6 +61,11 @@ def mock_new_socket():
 
 @pytest.fixture(autouse=True)
 def run_model_interface():
+    """
+    A function for initialising the REP socket that is initialised by the
+    model-process. This is done in its own thread with a non-blocking
+    `recv_multipart` so that the server-process can send/receive messages too.
+    """    
     context = zmq.Context()
     socket = context.socket(zmq.REP)
     socket.bind(f"tcp://*:{port}")
@@ -69,6 +89,7 @@ def run_model_interface():
 
 zmqS = ZMQInterfaceServer(port=port)
 
+# Test each of the interface's functions
 @patch.object(zmqS, '_new_socket', mock_new_socket)
 def test_server_args_request():
     result = zmqS.server_args_request_send()

@@ -10,6 +10,10 @@ server_subprocess_args = {'arg1': 'test1', 'arg2': 'test2'}
 @patch.object(DCFServer, 'start_server')
 @patch.object(DCFServer, '__init__', return_value=None)
 def test_requests_args(DCFServer_init_mock, DCFServer_start_mock, ZQMIS_init_mock, server_args_request_mock):
+    """
+    Tests that the script initialises the ZMQ interface correctly and starts
+    the server with the correct args.
+    """
     run_subprocess('test_port')
     ZQMIS_init_mock.assert_called_once_with('test_port')
     server_args_request_mock.assert_called_once_with()
