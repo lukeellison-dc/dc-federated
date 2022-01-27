@@ -720,25 +720,26 @@ class DCFServerHandler(object):
         }
         self.socket_port = socket_port
 
-        self.initialise_zqm()
-
     def start_server(self):
         """
         Starts the server as a separate process, sets up the socket and interface, and
         waits for messages from the server process.
         """
+        self.initialise_zmq()
+
         current_dir = os.path.dirname(os.path.abspath(__file__))
         subprocess_file = f"{current_dir}/subprocess_dcf_server.py"
         command = ' '.join(["python", subprocess_file, str(self.socket_port)])
         sp.Popen(command, stdout=sys.stdout, stderr=sys.stderr, shell=True)
+        
         self.wait_for_messages()
 
-    def initialise_zqm(self):
+    def initialise_zmq(self):
         """
         Initialises the ZeroMQ socket.
         """
-        context = zmq.Context()
-        self.socket = context.socket(zmq.REP)
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.REP)
         self.socket.bind(f"tcp://*:{self.socket_port}")
 
     def wait_for_messages(self):
@@ -759,3 +760,7 @@ class DCFServerHandler(object):
             #  Wait for next request from client
             logger.debug('Waiting for next zmq message...')
             zmqi.receive()
+
+    def __del__(self):
+        self.socket.close()
+        self.context.term()
